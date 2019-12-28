@@ -80,15 +80,15 @@ class Bot(irc.client.SimpleIRCClient):
         msg = event.arguments[0].strip()
 
         # strip pasted nicks from messages
-        msg = re.sub("<\S+>\s+", "", msg)
+        msg = re.sub(r"<\S+>\s+", "", msg)
 
         # strip kibot style quotes from messages
-        match = re.match("\"(.*)\" --\S+, \d+-\S+\d+.", msg)
+        match = re.match(r"\"(.*)\" --\S+, \d+-\S+\d+.", msg)
         if match:
             msg = match.group(1)
 
         # look for messages directed to a user
-        match = re.match("\s*(\S+)[,:]\s+(.*?)\s*$", msg)
+        match = re.match(r"\s*(\S+)[,:]\s+(.*?)\s*$", msg)
 
         if match:
             to = match.group(1)

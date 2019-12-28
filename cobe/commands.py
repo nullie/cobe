@@ -49,7 +49,7 @@ def progress_generator(filename):
     size_left = s.st_size
 
     fd = open(filename)
-    for line in fd.xreadlines():
+    for line in fd:
         size_left = size_left - len(line)
         progress = 100 * (1. - (float(size_left) / float(s.st_size)))
 
@@ -72,7 +72,7 @@ class LearnCommand:
 
         for filename in args.file:
             now = time.time()
-            print filename
+            print(filename)
 
             count = 0
             for line, progress in progress_generator(filename):
@@ -91,7 +91,7 @@ class LearnCommand:
                     b.graph.commit()
 
             elapsed = time.time() - now
-            print "\r100%% (%d/s)" % (count / elapsed)
+            print("\r100%% (%d/s)" % (count / elapsed))
 
         b.stop_batch_learning()
 
@@ -120,7 +120,7 @@ class LearnIrcLogCommand:
 
         for filename in args.file:
             now = time.time()
-            print filename
+            print(filename)
 
             count = 0
             for line, progress in progress_generator(filename):
@@ -150,14 +150,14 @@ class LearnIrcLogCommand:
                     b.reply(msg)
 
             elapsed = time.time() - now
-            print "\r100%% (%d/s)" % (count / elapsed)
+            print("\r100%% (%d/s)" % (count / elapsed))
 
         b.stop_batch_learning()
 
     @staticmethod
     def _parse_irc_message(msg, ignored_nicks=None, only_nicks=None):
         # only match lines of the form "HH:MM <nick> message"
-        match = re.match("\d+:\d+\s+<(.+?)>\s+(.*)", msg)
+        match = re.match(r"\d+:\d+\s+<(.+?)>\s+(.*)", msg)
         if not match:
             return None
 
@@ -173,13 +173,13 @@ class LearnIrcLogCommand:
         to = None
 
         # strip "username: " at the beginning of messages
-        match = re.search("^(\S+)[,:]\s+(\S.*)", msg)
+        match = re.search(r"^(\S+)[,:]\s+(\S.*)", msg)
         if match:
             to = match.group(1)
             msg = match.group(2)
 
         # strip kibot style '"asdf" --user, 06-oct-09' quotes
-        msg = re.sub("\"(.*)\" --\S+,\s+\d+-\S+-\d+",
+        msg = re.sub(r"\"(.*)\" --\S+,\s+\d+-\S+-\d+",
                      lambda m: m.group(1), msg)
 
         return to, msg
@@ -204,13 +204,13 @@ class ConsoleCommand:
 
         while True:
             try:
-                cmd = raw_input("> ")
+                cmd = input("> ")
             except EOFError:
-                print
+                print()
                 sys.exit(0)
 
             b.learn(cmd)
-            print b.reply(cmd).encode("utf-8")
+            print(b.reply(cmd).encode("utf-8"))
 
 
 class IrcClientCommand:

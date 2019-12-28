@@ -14,7 +14,7 @@ to be a token:
 
 This tokenizer ignores differences in capitalization."""
     def split(self, phrase):
-        if type(phrase) != types.UnicodeType:
+        if type(phrase) != str:
             raise TypeError("Input must be Unicode")
 
         if len(phrase) == 0:
@@ -32,10 +32,10 @@ This tokenizer ignores differences in capitalization."""
         """Capitalize the first alpha character in the reply and the
         first alpha character that follows one of [.?!] and a
         space."""
-        chars = list(u"".join(words))
+        chars = list("".join(words))
         start = True
 
-        for i in xrange(len(chars)):
+        for i in range(len(chars)):
             char = chars[i]
             if char.isalpha():
                 if start:
@@ -48,7 +48,7 @@ This tokenizer ignores differences in capitalization."""
                 if i > 2 and chars[i - 1] in ".?!" and char.isspace():
                     start = True
 
-        return u"".join(chars)
+        return "".join(chars)
 
 
 class CobeTokenizer:
@@ -71,15 +71,15 @@ tokens."""
         # the list of non-word characters, so if it's found entirely within
         # punctuation it's a normal non-word (e.g. :-( )
 
-        self.regex = re.compile("(\w+:\S+"  # urls
-                                "|[\w'-]+"  # words
-                                "|[^\w\s][^\w]*[^\w\s]"  # multiple punctuation
-                                "|[^\w\s]"  # a single punctuation character
-                                "|\s+)",    # whitespace
+        self.regex = re.compile(r"(\w+:\S+"  # urls
+                                r"|[\w'-]+"  # words
+                                r"|[^\w\s][^\w]*[^\w\s]"  # multiple punctuation
+                                r"|[^\w\s]"  # a single punctuation character
+                                r"|\s+)",    # whitespace
                                 re.UNICODE)
 
     def split(self, phrase):
-        if type(phrase) != types.UnicodeType:
+        if type(phrase) != str:
             raise TypeError("Input must be Unicode")
 
         # Strip leading and trailing whitespace. This might not be the
@@ -93,7 +93,7 @@ tokens."""
         tokens = self.regex.findall(phrase)
 
         # collapse runs of whitespace into a single space
-        space = u" "
+        space = " "
         for i, token in enumerate(tokens):
             if token[0] == " " and len(token) > 1:
                 tokens[i] = space
@@ -101,7 +101,7 @@ tokens."""
         return tokens
 
     def join(self, words):
-        return u"".join(words)
+        return "".join(words)
 
 
 class CobeStemmer:
@@ -110,7 +110,7 @@ class CobeStemmer:
         self.stemmer = Stemmer.Stemmer(name)
 
     def stem(self, token):
-        if not re.search("\w", token, re.UNICODE):
+        if not re.search(r"\w", token, re.UNICODE):
             return self.stem_nonword(token)
 
         # Don't preserve case when stemming, i.e. create lowercase stems.
@@ -124,8 +124,8 @@ class CobeStemmer:
 
     def stem_nonword(self, token):
         # Stem common smile and frown emoticons down to :) and :(
-        if re.search(":-?[ \)]*\)", token):
+        if re.search(r":-?[ \)]*\)", token):
             return ":)"
 
-        if re.search(":-?[' \(]*\(", token):
+        if re.search(r":-?[' \(]*\(", token):
             return ":("
